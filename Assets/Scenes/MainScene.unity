@@ -1343,8 +1343,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3286d6ca78db204c9ae1efa89bbd548, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidad: 5
-  rigidbody2D: {fileID: 0}
+  speed: 5
+  jumpForce: 7
 --- !u!1 &1682868933
 GameObject:
   m_ObjectHideFlags: 0
@@ -1442,7 +1442,7 @@ GameObject:
   - component: {fileID: 1726293315}
   m_Layer: 0
   m_Name: road&border
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

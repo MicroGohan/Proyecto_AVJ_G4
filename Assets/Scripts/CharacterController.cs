@@ -4,42 +4,53 @@ using UnityEngine;
 
 public class CharacterController : MonoBehaviour
 {
-    public float speed = 5f;
-    public float jumpForce = 7f;
-    private Rigidbody2D rb;
-    private bool isGrounded;
+
+    private float movimientoFuerza = 12f;
+
+
+
+    private Rigidbody2D miCuerpoRigido;
+
+
+
+    // Start is called before the first frame update
 
     void Start()
+
     {
-        rb = GetComponent<Rigidbody2D>();
+
+        miCuerpoRigido = GetComponent<Rigidbody2D>();
+
+
+
     }
+
+
+
+    // Update is called once per frame
 
     void Update()
+
     {
-        Move();
-        Jump();
+
+        float movementX = Input.GetAxisRaw("Horizontal"); //esta variable puede ser -1, 0 o 1
+
+        Vector2 posicionJug = transform.position;
+
+
+
+        posicionJug = posicionJug + new Vector2(movementX, 0f) * movimientoFuerza * Time.deltaTime;
+
+
+
+        transform.position = posicionJug;
+
+
+
+
+
+
+
     }
 
-    void Move()
-    {
-        float moveInput = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(moveInput * speed, rb.velocity.y);
-    }
-
-    void Jump()
-    {
-        if (Input.GetKeyDown(KeyCode.UpArrow) && isGrounded)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            isGrounded = false;
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;
-        }
-    }
 }
