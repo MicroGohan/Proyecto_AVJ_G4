@@ -1209,6 +1209,7 @@ GameObject:
   - component: {fileID: 1435731709}
   - component: {fileID: 1435731711}
   - component: {fileID: 1435731712}
+  - component: {fileID: 1435731713}
   m_Layer: 0
   m_Name: Samurai
   m_TagString: Untagged
@@ -1330,6 +1331,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.68343425, y: 2.339861}
   m_EdgeRadius: 0
+--- !u!114 &1435731713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435731708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3286d6ca78db204c9ae1efa89bbd548, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  velocidad: 5
+  rigidbody2D: {fileID: 0}
 --- !u!1 &1682868933
 GameObject:
   m_ObjectHideFlags: 0
