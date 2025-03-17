@@ -4,45 +4,122 @@ using UnityEngine;
 
 public class CharacterController : MonoBehaviour
 {
-    [Header("Configuración de Movimiento")]
-    [Tooltip("Fuerza del movimiento horizontal del personaje.")]
-    public float movimientoFuerza = 12f;  // Fuerza de movimiento horizontal
 
-    [Header("Configuración de Salto")]
+    [Header("Configuracion de Movimiento")]
+    [Tooltip("Fuerza del movimiento del personaje.")]
+    public int runSpeed = 1;
+
+    [Header("Configuracion de Salto")]
     [Tooltip("Fuerza del salto del personaje.")]
-    public float saltoFuerza = 10f;  // Fuerza del salto
+    public int jumpStrength = 1;
 
-    private Rigidbody2D miCuerpoRigido;
-    private bool estaEnSuelo;  // Verifica si el personaje está en el suelo
+    //Movimiento
+    float horizontal;
+    float vertical;
+    bool facingRight;
+
+    //Animador
+    Animator animator;
+
+    //Salto
+    Rigidbody2D cuerpoRigido;
+    float axisY;
+    bool isJump;
 
     // Layer para el suelo
     public Transform chequeoSuelo;
     public LayerMask capaSuelo;
 
-    // Start is called before the first frame update
-    void Start()
+    // Ataque
+    bool isAttack;
+
+    void Awake() // Metodo para comenzar las animaciones
     {
-        miCuerpoRigido = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        cuerpoRigido = GetComponent<Rigidbody2D>();
+        cuerpoRigido.Sleep();
     }
 
-    // Update is called once per frame
-    void Update()
+    void Update() // Acciones
     {
-        float movimientoX = Input.GetAxisRaw("Horizontal"); // Esta variable puede ser -1, 0 o 1
-        Vector2 posicionJug = transform.position;
+        horizontal = Input.GetAxis("Horizontal");
+        vertical = Input.GetAxis("Vertical");
 
-        // Movimiento horizontal
-        posicionJug = posicionJug + new Vector2(movimientoX, 0f) * movimientoFuerza * Time.deltaTime;
+        animator.SetFloat("Speed", Mathf.Abs(horizontal != 0 ? horizontal : vertical));
 
-        // Saltar
-        if (Input.GetButtonDown("Jump") && estaEnSuelo)  // Verifica si se presiona el botón de salto y si está en el suelo
+        
+
+    }
+
+    void onLand() // Metodo para aterrizar
+    {
+        isJump = false;
+        cuerpoRigido.gravityScale = 0f;
+        cuerpoRigido.Sleep();
+        axisY = transform.position.y;
+        animator.SetBool("isJump", false);
+    }
+
+    void FixedUpdate() // Metodo para ejecutar acciones por frames
+    {
+
+        if(Input.GetButton("Fire1"))
         {
-            miCuerpoRigido.velocity = new Vector2(miCuerpoRigido.velocity.x, saltoFuerza);  // Establece la velocidad de salto
+            isAttack = true;
+            if (vertical != 0 || horizontal != 0)
+            {
+                vertical = 0;
+                horizontal = 0;
+                animator.SetFloat("Speed",0);
+            }
+
+            animator.SetTrigger("Attack1");
         }
 
-        transform.position = posicionJug;
+        if(transform.position.y <= axisY && isJump)
+        {
+            onLand();
+        }
 
-        // Verificar si el personaje está en el suelo
-        estaEnSuelo = Physics2D.OverlapCircle(chequeoSuelo.position, 0.2f, capaSuelo);  // Verifica si está tocando el suelo
+        if(Input.GetButtonDown("Jump") && !isJump)
+        {
+            axisY = transform.position.y;
+            isJump = true;
+            cuerpoRigido.gravityScale = 1.5f;
+            cuerpoRigido.WakeUp();
+            cuerpoRigido.AddForce(new Vector2(0, jumpStrength));
+            animator.SetBool("isJump", isJump);
+        }
+
+        if((vertical != 0 || horizontal != 0) && !isAttack)
+        {
+            Vector3 movement = new Vector3(horizontal * runSpeed, vertical * runSpeed, 0.0f);
+            transform.position = transform.position + movement * Time.deltaTime;
+        }
+        
+        
+        Flip(horizontal);
+
+        
+    }
+
+    public void AlertObservers(string message)
+    {
+        if(message == "AttackEnd")
+        {
+            isAttack= false;
+        }
+    }
+
+    private void Flip(float horizontal) // Metodo para hacer que el jugador vea a la izquierda
+    {
+        if(horizontal < 0 && !facingRight || horizontal > 0 && facingRight)
+        {
+            facingRight = !facingRight;
+
+            Vector3 scale = transform.localScale;
+            scale.x *= -1;
+            transform.localScale = scale;
+        }
     }
 }
