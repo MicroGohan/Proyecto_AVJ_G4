@@ -1718,7 +1718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   runSpeed: 7
   jumpStrength: 300
-  chequeoSuelo: {fileID: 0}
+  chequeoSuelo: {fileID: 343163195}
   capaSuelo:
     serializedVersion: 2
     m_Bits: 0
