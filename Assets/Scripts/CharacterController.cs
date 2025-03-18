@@ -13,6 +13,13 @@ public class CharacterController : MonoBehaviour
     [Tooltip("Fuerza del salto del personaje.")]
     public int jumpStrength = 1;
 
+    [Header("Límites de Movimiento")]
+    [Tooltip("Límite inferior en el eje Y.")]
+    public float minY = -3f;
+
+    [Tooltip("Límite superior en el eje Y.")]
+    public float maxY = -0.5f;
+
     //Movimiento
     float horizontal;
     float vertical;
@@ -96,8 +103,16 @@ public class CharacterController : MonoBehaviour
             Vector3 movement = new Vector3(horizontal * runSpeed, vertical * runSpeed, 0.0f);
             transform.position = transform.position + movement * Time.deltaTime;
         }
-        
-        
+
+        // Calcula la nueva posición
+        Vector3 newPosition = transform.position + new Vector3(horizontal * runSpeed, vertical * runSpeed, 0.0f) * Time.deltaTime;
+
+        // Aplica los límites en el eje Y
+        newPosition.y = Mathf.Clamp(newPosition.y, minY, maxY);
+
+        // Asigna la nueva posición al personaje
+        transform.position = newPosition;
+
         Flip(horizontal);
 
         
