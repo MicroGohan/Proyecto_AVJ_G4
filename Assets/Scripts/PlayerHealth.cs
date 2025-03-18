@@ -6,7 +6,7 @@ using TMPro;
 public class PlayerHealth : MonoBehaviour
 {
     public int maxLives = 3; // Vidas máximas del jugador
-    private int currentLives; // Vidas actuales del jugador
+    public int currentLives; // Vidas actuales del jugador
     public TMP_Text livesText; // Referencia al texto TMP de las vidas
 
     void Start()
@@ -14,15 +14,7 @@ public class PlayerHealth : MonoBehaviour
         currentLives = maxLives; // Inicializa las vidas al máximo
         UpdateLivesText(); // Actualiza el texto de las vidas
     }
-
-    void Update()
-    {
-        // Simula recibir daño al presionar la tecla "L" (solo para pruebas)
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            TakeDamage(1);
-        }
-    }
+    
     // Método para recibir daño
     public void TakeDamage(int damage)
     {
