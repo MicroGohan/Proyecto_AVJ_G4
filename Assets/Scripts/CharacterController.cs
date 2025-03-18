@@ -13,12 +13,16 @@ public class CharacterController : MonoBehaviour
     [Tooltip("Fuerza del salto del personaje.")]
     public int jumpStrength = 1;
 
-    [Header("Límites de Movimiento")]
-    [Tooltip("Límite inferior en el eje Y.")]
+    [Header("Limites de Movimiento")]
+    [Tooltip("Limite inferior en el eje Y.")]
     public float minY = -3f;
 
-    [Tooltip("Límite superior en el eje Y.")]
+    [Tooltip("Limite superior en el eje Y.")]
     public float maxY = -0.5f;
+
+    [Header("Configuracion de Rebote")]
+    [Tooltip("Fuerza que empuja al personaje cuando es daÃ±ado.")]
+    public int bounceStrength = 1;
 
     //Movimiento
     float horizontal;
@@ -39,6 +43,9 @@ public class CharacterController : MonoBehaviour
 
     // Ataque
     bool isAttack;
+
+    // DaÃ±o
+    public bool isAttacked;
 
     void Awake() // Metodo para comenzar las animaciones
     {
@@ -65,12 +72,13 @@ public class CharacterController : MonoBehaviour
         cuerpoRigido.Sleep();
         axisY = transform.position.y;
         animator.SetBool("isJump", false);
+        
     }
 
     void FixedUpdate() // Metodo para ejecutar acciones por frames
     {
 
-        if(Input.GetButton("Fire1"))
+        if(Input.GetButton("Fire1") && !isJump && !isAttacked)
         {
             isAttack = true;
             if (vertical != 0 || horizontal != 0)
@@ -88,7 +96,7 @@ public class CharacterController : MonoBehaviour
             onLand();
         }
 
-        if(Input.GetButtonDown("Jump") && !isJump)
+        if(Input.GetButtonDown("Jump") && !isJump && !isAttacked)
         {
             axisY = transform.position.y;
             isJump = true;
@@ -98,23 +106,24 @@ public class CharacterController : MonoBehaviour
             animator.SetBool("isJump", isJump);
         }
 
-        if((vertical != 0 || horizontal != 0) && !isAttack)
+        if((vertical != 0 || horizontal != 0) && !isAttack && !isAttacked)
         {
             Vector3 movement = new Vector3(horizontal * runSpeed, vertical * runSpeed, 0.0f);
             transform.position = transform.position + movement * Time.deltaTime;
         }
 
-        // Calcula la nueva posición
+
+        // Calcula la nueva posicion
         Vector3 newPosition = transform.position + new Vector3(horizontal * runSpeed, vertical * runSpeed, 0.0f) * Time.deltaTime;
 
-        // Aplica los límites en el eje Y
+        // Aplica los limites en el eje Y
         newPosition.y = Mathf.Clamp(newPosition.y, minY, maxY);
 
-        // Asigna la nueva posición al personaje
+        // Asigna la nueva posicion al personaje
         transform.position = newPosition;
 
         Flip(horizontal);
-
+        
         
     }
 
@@ -136,5 +145,24 @@ public class CharacterController : MonoBehaviour
             scale.x *= -1;
             transform.localScale = scale;
         }
+    }
+
+    public void beingAttacked(Vector2 direccion,int DMG ) // Metodo para daÃ±ar al jugador
+    {
+        if(!isAttacked)
+        {
+            isAttacked = true;
+            animator.SetBool("isAttacked", isAttacked);
+            Vector2 bounce = new Vector2(transform.position.x - direccion.x, 1).normalized;
+            cuerpoRigido .AddForce(bounce*bounceStrength, ForceMode2D.Impulse);
+
+        }
+        
+    }
+
+    void periodoInvencibilidad() // Metodo para que el jugador tenga un momento de invencibilidad luego de ser atacado
+    {
+        isAttacked = false;
+        
     }
 }
