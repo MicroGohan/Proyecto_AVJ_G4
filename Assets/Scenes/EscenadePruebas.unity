@@ -493,6 +493,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   runSpeed: 7
   jumpStrength: 1
+  minY: -3.8
+  maxY: -1.5
   chequeoSuelo: {fileID: 1817773395}
   capaSuelo:
     serializedVersion: 2
