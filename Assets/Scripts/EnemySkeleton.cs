@@ -161,6 +161,15 @@ public class EnemySkeleton : EnemyBehaviour
 
     private void Die()
     {
+        if (ScoreManager.Instance == null)
+        {
+            Debug.LogError("¡No hay ScoreManager en la escena!");
+            return;
+        }
+
+        ScoreManager.Instance.AddScore(10);
+        Debug.Log("Puntos asignados"); // Añadir este debug
+
         Debug.Log("¡Esqueleto derrotado!");
         if (animator != null)
         {
@@ -183,7 +192,6 @@ public class EnemySkeleton : EnemyBehaviour
         {
             rb.simulated = false;
         }
-
         // Destruye el objeto después de un breve retraso (opcional)
         Destroy(gameObject, 2f);
     }

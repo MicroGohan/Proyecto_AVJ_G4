@@ -297,7 +297,7 @@ MonoBehaviour:
   attackDamage: 1
   maxHealth: 3
   target: {fileID: 1676480031}
-  attackPoint: {fileID: 0}
+  attackPoint: {fileID: 550337570}
   attackRadius: 0.5
 --- !u!95 &111133903
 Animator:
@@ -550,7 +550,7 @@ MonoBehaviour:
   attackDamage: 1
   maxHealth: 3
   target: {fileID: 1676480031}
-  attackPoint: {fileID: 0}
+  attackPoint: {fileID: 2099206665}
   attackRadius: 0.5
 --- !u!95 &179539137
 Animator:
@@ -2285,7 +2285,7 @@ MonoBehaviour:
   attackDamage: 1
   maxHealth: 3
   target: {fileID: 1676480031}
-  attackPoint: {fileID: 0}
+  attackPoint: {fileID: 826609978}
   attackRadius: 0.5
 --- !u!95 &915264253
 Animator:

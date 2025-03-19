@@ -8,6 +8,22 @@ public class ScoreManager : MonoBehaviour
     public TMP_Text scoreText; // Referencia al texto TMP
     private int score = 0;     // Variable para almacenar el puntaje
 
+    public static ScoreManager Instance;
+
+    void Awake()
+    {
+        // Configurar patrón Singleton
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Persistir entre escenas
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
         // Inicializa el texto con el puntaje inicial
@@ -19,7 +35,7 @@ public class ScoreManager : MonoBehaviour
         // Verifica si se presiona la tecla "P"
         if (Input.GetKeyDown(KeyCode.P))
         {
-            AddScore(1); // Aumenta el puntaje en 1
+            AddScore(10); // Aumenta el puntaje en 1
         }
     }
 
@@ -28,6 +44,7 @@ public class ScoreManager : MonoBehaviour
     {
         score += points;
         UpdateScoreText();
+        Debug.Log($"Puntos sumados: {points} | Total: {score}");
     }
 
     // Método para actualizar el texto del puntaje
