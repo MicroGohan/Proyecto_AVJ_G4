@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySkeleton : EnemyBehaviour
 {
-
+    public LayerMask Player; // Asigna la capa "Player" en el Inspector
     public float speed;
     public float chaseDistance;
     public float stopDistance;
@@ -17,16 +17,27 @@ public class EnemySkeleton : EnemyBehaviour
     private float targetDistance;
     private float nextAttackTime = 0f; // Tiempo para el próximo ataque
     Animator animator;
+    private Rigidbody2D rb;
 
+    [Header("Punto de Ataque")]
+    public Transform attackPoint; // Crear un GameObject hijo y asignarlo
+    public float attackRadius = 0.5f; // Radio del área de daño
     // Start is called before the first frame update
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         currentHealth = maxHealth; // Inicializa la salud al máximo
+        target = GameObject.FindGameObjectWithTag("Player");
+
+        if (target == null)
+            Debug.LogError("¡No se encontró al jugador con tag 'Player'!");
     }
 
     void Update()
     {
+        if (target == null) return;
+
         targetDistance = Vector2.Distance(transform.position, target.transform.position);
         
         // Si el jugador está dentro del rango de persecución pero fuera del rango de ataque
@@ -81,11 +92,8 @@ public class EnemySkeleton : EnemyBehaviour
 
     private void Attack()
     {
-
-        // Elige un ataque aleatorio (1, 2 o 3)
-        int attackType = Random.Range(1, 4); // Random.Range(1, 4) genera un número entre 1 y 3
-
-        // Reproduce la animación de ataque correspondiente
+        // Elige un ataque aleatorio
+        int attackType = Random.Range(1, 4);
         switch (attackType)
         {
             case 1:
@@ -99,31 +107,52 @@ public class EnemySkeleton : EnemyBehaviour
                 break;
         }
 
-        // Detecta si el jugador está dentro del rango de ataque
-        Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(transform.position, attackDistance, LayerMask.GetMask("Player"));
-        foreach (Collider2D player in hitPlayers)
+        // Ejecutar daño con delay
+        StartCoroutine(ApplyDamageWithDelay(0.3f)); // Ajustar tiempo según animación
+    }
+
+    // Nuevo método para aplicar daño
+    private IEnumerator ApplyDamageWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(
+            attackPoint.position,
+            attackRadius,
+            Player
+        );
+
+        foreach (Collider2D playerCollider in hitPlayers)
         {
-            if (player.CompareTag("Player"))
+            CharacterController player = playerCollider.GetComponent<CharacterController>();
+            if (player != null)
             {
-                // Aplica daño al jugador
-                player.GetComponent<CharacterController>().beingAttacked(Vector2.zero, attackDamage);
-                Debug.Log("¡Enemigo atacó al jugador! Daño: " + attackDamage);
+                Vector2 attackDirection = (player.transform.position - transform.position).normalized;
+                player.beingAttacked(attackDirection, attackDamage);
+                Debug.Log("¡Golpe exitoso!");
             }
         }
     }
 
+
+
     public void TakeDamage(int damage)
     {
-        if (currentHealth <= 0) return; // Si ya está muerto, no hace nada
-
-        // Reduce la salud
+        // Reduce la salud del esqueleto
         currentHealth -= damage;
         Debug.Log("Esqueleto recibió " + damage + " de daño. Salud restante: " + currentHealth);
 
         // Reproduce la animación de daño
-        animator.SetTrigger("Hurt");
+        if (animator != null)
+        {
+            animator.SetTrigger("Hurt");
+        }
+        else
+        {
+            Debug.LogWarning("Animator no está asignado en el esqueleto.");
+        }
 
-        // Si la salud llega a 0, muere
+        // Verifica si el esqueleto murió
         if (currentHealth <= 0)
         {
             Die();
@@ -132,22 +161,34 @@ public class EnemySkeleton : EnemyBehaviour
 
     private void Die()
     {
-        // Reproduce la animación de muerte
-        animator.SetTrigger("Dead");
+        Debug.Log("¡Esqueleto derrotado!");
+        if (animator != null)
+        {
+            animator.SetTrigger("Dead");
+        }
 
-        // Desactiva el comportamiento del enemigo
+        // Desactiva el comportamiento del esqueleto
         enabled = false;
 
         // Desactiva el collider (opcional)
-        GetComponent<Collider2D>().enabled = false;
+        Collider2D collider = GetComponent<Collider2D>();
+        if (collider != null)
+        {
+            collider.enabled = false;
+        }
 
         // Desactiva el Rigidbody2D (opcional)
-        GetComponent<Rigidbody2D>().simulated = false;
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.simulated = false;
+        }
 
-        Debug.Log("¡Esqueleto derrotado!");
+        // Destruye el objeto después de un breve retraso (opcional)
+        Destroy(gameObject, 2f);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    /*private void OnCollisionEnter2D(Collision2D collision)
     {
 
         if(collision.gameObject.CompareTag("Player"))
@@ -156,5 +197,21 @@ public class EnemySkeleton : EnemyBehaviour
             collision.gameObject.GetComponent<CharacterController>().beingAttacked(direccionDMG, 1);
         }
 
+    }*/
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            // Mejor cálculo de dirección
+            Vector2 direccionDMG = (collision.transform.position - transform.position).normalized;
+
+            // Asegurar que el jugador tenga el componente
+            CharacterController player = collision.gameObject.GetComponent<CharacterController>();
+            if (player != null)
+            {
+                player.beingAttacked(direccionDMG, 1);
+            }
+        }
     }
 }

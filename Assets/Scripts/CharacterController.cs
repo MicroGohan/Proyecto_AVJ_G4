@@ -3,232 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-/*public class CharacterController : MonoBehaviour
-{
-    [Header("Configuracion de Movimiento")]
-    [Tooltip("Fuerza del movimiento del personaje.")]
-    public int runSpeed = 1;
-
-    [Header("Configuracion de Salto")]
-    [Tooltip("Fuerza del salto del personaje.")]
-    public int jumpStrength = 1;
-
-    [Header("Limites de Movimiento")]
-    [Tooltip("Limite inferior en el eje Y.")]
-    public float minY = -3f;
-
-    [Tooltip("Limite superior en el eje Y.")]
-    public float maxY = -0.5f;
-
-    [Header("Configuracion de Rebote")]
-    [Tooltip("Fuerza que empuja al personaje cuando es dañado.")]
-    public int bounceStrength = 1;
-
-    [Header("Configuracion de Salud")]
-    [Tooltip("Salud máxima del personaje.")]
-    public int maxHealth = 3;
-
-    public int currentLives;
-    public TMP_Text Lives;
-
-    [Tooltip("Tiempo de invencibilidad después de recibir daño.")]
-    public float invincibilityTime = 1f;
-
-    // Movimiento
-    float horizontal;
-    float vertical;
-    bool facingRight;
-
-    // Animador
-    Animator animator;
-
-    // Salto
-    Rigidbody2D cuerpoRigido;
-    float axisY;
-    bool isJump;
-
-    // Layer para el suelo
-    public Transform chequeoSuelo;
-    public LayerMask capaSuelo;
-
-    // Ataque
-    bool isAttack;
-
-    // Daño
-    public bool isAttacked;
-    private int currentHealth; // Salud actual del personaje
-    private bool isInvincible = false; // Indica si el personaje es invencible
-
-    void Awake() // Metodo para comenzar las animaciones
-    {
-        animator = GetComponent<Animator>();
-        cuerpoRigido = GetComponent<Rigidbody2D>();
-        cuerpoRigido.Sleep();
-        currentHealth = maxHealth; // Inicializa la salud al máximo
-    }
-
-    void Update() // Acciones
-    {
-        horizontal = Input.GetAxis("Horizontal");
-        vertical = Input.GetAxis("Vertical");
-
-        animator.SetFloat("Speed", Mathf.Abs(horizontal != 0 ? horizontal : vertical));
-        
-        // Simula recibir daño al presionar la tecla "L" (solo para pruebas)
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            beingAttacked(new Vector2(1, 0), 1); // Dirección: derecha, Daño: 
-        }
-        
-    }
-
-    void onLand() // Metodo para aterrizar
-    {
-        isJump = false;
-        cuerpoRigido.gravityScale = 0f;
-        cuerpoRigido.Sleep();
-        axisY = transform.position.y;
-        animator.SetBool("isJump", false);
-    }
-
-    void FixedUpdate() // Metodo para ejecutar acciones por frames
-    {
-        if (Input.GetButton("Fire1") && !isJump && !isAttacked)
-        {
-            isAttack = true;
-            if (vertical != 0 || horizontal != 0)
-            {
-                vertical = 0;
-                horizontal = 0;
-                animator.SetFloat("Speed", 0);
-            }
-
-            animator.SetTrigger("Attack1");
-        }
-
-        if (transform.position.y <= axisY && isJump)
-        {
-            onLand();
-        }
-
-        if (Input.GetButtonDown("Jump") && !isJump && !isAttacked)
-        {
-            axisY = transform.position.y;
-            isJump = true;
-            cuerpoRigido.gravityScale = 1.5f;
-            cuerpoRigido.WakeUp();
-            cuerpoRigido.AddForce(new Vector2(0, jumpStrength));
-            animator.SetBool("isJump", isJump);
-        }
-
-        if ((vertical != 0 || horizontal != 0) && !isAttack && !isAttacked)
-        {
-            Vector3 movement = new Vector3(horizontal * runSpeed, vertical * runSpeed, 0.0f);
-            transform.position = transform.position + movement * Time.deltaTime;
-        }
-
-        // Calcula la nueva posicion
-        Vector3 newPosition = transform.position + new Vector3(horizontal * runSpeed, vertical * runSpeed, 0.0f) * Time.deltaTime;
-
-        // Aplica los limites en el eje Y
-        newPosition.y = Mathf.Clamp(newPosition.y, minY, maxY);
-
-        // Asigna la nueva posicion al personaje
-        transform.position = newPosition;
-
-        Flip(horizontal);
-    }
-
-    public void AlertObservers(string message)
-    {
-        if (message == "AttackEnd")
-        {
-            isAttack = false;
-        }
-    }
-
-    private void Flip(float horizontal) // Metodo para hacer que el jugador vea a la izquierda
-    {
-        if (horizontal < 0 && !facingRight || horizontal > 0 && facingRight)
-        {
-            facingRight = !facingRight;
-
-            Vector3 scale = transform.localScale;
-            scale.x *= -1;
-            transform.localScale = scale;
-        }
-    }
-
-    public void beingAttacked(Vector2 direccion, int DMG) // Metodo para dañar al jugador
-    {
-        if (!isAttacked && !isInvincible) // Solo recibe daño si no está en período de invencibilidad
-        {
-            isAttacked = true;
-            animator.SetBool("isAttacked", isAttacked);
-
-            // Reduce la salud
-            playerHealth.TakeDamage(DMG); // Llama al método TakeDamage del PlayerHealth
-
-            // Empuja al personaje en la dirección del ataque
-            Vector2 bounce = new Vector2(transform.position.x - direccion.x, 1).normalized;
-            cuerpoRigido.AddForce(bounce * bounceStrength, ForceMode2D.Impulse);
-
-            // Activa el período de invencibilidad
-            StartCoroutine(ActivateInvincibility());
-
-            // Detiene el empuje después de un breve período
-            StartCoroutine(StopBounce());
-
-            // Verifica si el personaje murió
-            if (playerHealth.currentLives <= 0)
-            {
-                Die();
-            }
-        }
-    }
-
-    IEnumerator StopBounce()
-    {
-        yield return new WaitForSeconds(0.2f); // Espera un breve período
-        cuerpoRigido.velocity = Vector2.zero; // Detiene el movimiento del Rigidbody2D
-    }
-
-    IEnumerator ActivateInvincibility()
-    {
-        isInvincible = true; // Activa la invencibilidad
-        yield return new WaitForSeconds(invincibilityTime); // Espera el tiempo de invencibilidad
-        isInvincible = false; // Desactiva la invencibilidad
-        isAttacked = false; // Restablece el estado de ataque
-        animator.SetBool("isAttacked", false); // Restablece la animación de daño
-    }
-
-    private void Die()
-    {
-        Debug.Log("¡Jugador derrotado!");
-        animator.SetTrigger("Dead"); // Reproduce la animación de muerte
-
-        // Desactiva el movimiento y el control del personaje
-        enabled = false;
-
-        // Desactiva el collider (opcional)
-        GetComponent<Collider2D>().enabled = false;
-
-        // Desactiva el Rigidbody2D (opcional)
-        GetComponent<Rigidbody2D>().simulated = false;
-
-        // Reinicia la escena después de un breve retraso
-        StartCoroutine(RestartLevel());
-    }
-
-    IEnumerator RestartLevel()
-    {
-        yield return new WaitForSeconds(2f); // Espera 2 segundos antes de reiniciar
-        UnityEngine.SceneManagement.SceneManager.LoadScene(
-            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
-        );
-    }
-}*/
-
 public class CharacterController : MonoBehaviour
 {
     [Header("Configuracion de Movimiento")]
@@ -284,6 +58,37 @@ public class CharacterController : MonoBehaviour
     public bool isAttacked;
     private int currentHealth; // Salud actual del personaje
     private bool isInvincible = false; // Indica si el personaje es invencible
+
+    public GameObject attackArea;
+    private bool isAttacking = false;
+
+    // Modifica el método TryAttack para activar/desactivar el área
+    public void TryAttack()
+    {
+        if (!isAttacking)
+        {
+            isAttacking = true;
+            animator.SetTrigger("Attack1");
+            StartCoroutine(AttackCooldown());
+        }
+    }
+
+    IEnumerator AttackCooldown()
+    {
+        yield return new WaitForSeconds(0.5f); // Duración del ataque
+        isAttacking = false;
+    }
+
+    // Métodos para activar/desactivar el área (llamados desde Animation Events)
+    public void EnableAttackArea()
+    {
+        attackArea.SetActive(true);
+    }
+
+    public void DisableAttackArea()
+    {
+        attackArea.SetActive(false);
+    }
 
     void Awake() // Metodo para comenzar las animaciones
     {
@@ -454,6 +259,7 @@ public class CharacterController : MonoBehaviour
             UnityEngine.SceneManagement.SceneManager.GetActiveScene().name
         );
     }
+
 
     private void UpdateLivesText()
     {
