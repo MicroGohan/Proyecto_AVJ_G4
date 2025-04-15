@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class CharacterController : MonoBehaviour
 {
@@ -248,8 +250,11 @@ public class CharacterController : MonoBehaviour
         // Desactiva el Rigidbody2D (opcional)
         GetComponent<Rigidbody2D>().simulated = false;
 
+        // Carga la escena de muerte
+        UnityEngine.SceneManagement.SceneManager.LoadScene("DeadScene");
+
         // Reinicia la escena después de un breve retraso
-        StartCoroutine(RestartLevel());
+        //StartCoroutine(RestartLevel());
     }
 
     IEnumerator RestartLevel()

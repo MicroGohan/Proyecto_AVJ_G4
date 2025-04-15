@@ -17,4 +17,11 @@ public class MenuManager : MonoBehaviour
         Debug.Log("Saliendo del juego...");
         Application.Quit();
     }
+
+    // Método para el botón "Retry"
+    public void Retry()
+    {
+        // Recarga la escena actual
+        SceneManager.LoadScene("MainScene");
+    }
 }

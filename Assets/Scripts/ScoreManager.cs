@@ -52,4 +52,9 @@ public class ScoreManager : MonoBehaviour
     {
         scoreText.text = "Score: " + score.ToString();
     }
+    // Propiedad pública para acceder al puntaje actual
+    public int CurrentScore
+    {
+        get { return score; }
+    }
 }
