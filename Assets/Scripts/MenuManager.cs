@@ -8,7 +8,7 @@ public class MenuManager : MonoBehaviour
     // Método para el botón "Iniciar Juego"
     public void StartGame()
     {
-        SceneManager.LoadScene("MainScene");
+        SceneManager.LoadScene("Level_1");
     }
 
     // Método para el botón "Salir"
@@ -22,6 +22,6 @@ public class MenuManager : MonoBehaviour
     public void Retry()
     {
         // Recarga la escena actual
-        SceneManager.LoadScene("MainScene");
+        SceneManager.LoadScene("Level_1");
     }
 }
