@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class ScoreManager : MonoBehaviour
 {
@@ -45,6 +46,12 @@ public class ScoreManager : MonoBehaviour
         score += points;
         UpdateScoreText();
         Debug.Log($"Puntos sumados: {points} | Total: {score}");
+
+        // Verifica si el puntaje ha alcanzado 40
+        if (score >= 40)
+        {
+            LoadNextScene();
+        }
     }
 
     // Método para actualizar el texto del puntaje
@@ -56,5 +63,11 @@ public class ScoreManager : MonoBehaviour
     public int CurrentScore
     {
         get { return score; }
+    }
+
+    private void LoadNextScene()
+    {
+        Debug.Log("Cargando la siguiente escena...");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }

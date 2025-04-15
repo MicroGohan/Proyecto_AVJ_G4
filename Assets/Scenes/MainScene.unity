@@ -2491,7 +2491,7 @@ MonoBehaviour:
   chequeoSuelo: {fileID: 343163195}
   capaSuelo:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   isAttacked: 0
   attackArea: {fileID: 0}
 --- !u!95 &1676480033
