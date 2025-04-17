@@ -240,7 +240,10 @@ public class CharacterController : MonoBehaviour
     {
         Debug.Log("¡Jugador derrotado!");
         animator.SetTrigger("Dead"); // Reproduce la animación de muerte
-
+        if (ScoreManager.Instance != null) 
+        {
+            ScoreManager.Instance.SaveTotalScore();
+        }
         // Desactiva el movimiento y el control del personaje
         enabled = false;
 

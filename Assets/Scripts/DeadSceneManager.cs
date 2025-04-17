@@ -5,20 +5,50 @@ using TMPro;
 
 public class DeadSceneManager : MonoBehaviour
 {
-    [Tooltip("Referencia al texto TMP para mostrar el puntaje.")]
+    [Tooltip("Referencia al texto TMP para mostrar el puntaje final.")]
     public TMP_Text scoreText;
 
     void Start()
     {
-        // Asegúrate de que ScoreManager.Instance no sea nulo
-        if (ScoreManager.Instance != null && scoreText != null)
+        DisplayScores();
+    }
+
+    void DisplayScores()
+    {
+        Debug.Log("DisplayScores llamado");
+
+        if (scoreText == null)
         {
-            // Obtén el puntaje actual y actualiza el texto
-            scoreText.text = "Final Score: " + ScoreManager.Instance.CurrentScore.ToString();
+            Debug.LogError("¡scoreText no está asignado en el Inspector!");
+            return;
+        }
+
+        int finalScore = 0;
+
+        // Intenta obtener el puntaje del ScoreManager
+        if (ScoreManager.Instance != null)
+        {
+            Debug.Log("ScoreManager.Instance encontrado");
+            finalScore = ScoreManager.Instance.GetTotalScore();
+            Debug.Log($"Puntaje obtenido del ScoreManager: {finalScore}");
         }
         else
         {
-            Debug.LogWarning("ScoreManager o scoreText no están configurados correctamente.");
+            Debug.Log("ScoreManager.Instance es null, usando PlayerPrefs");
+            finalScore = PlayerPrefs.GetInt("TotalScore", 0);
+            Debug.Log($"Puntaje obtenido de PlayerPrefs: {finalScore}");
+        }
+
+        // Actualiza el texto
+        try
+        {
+            Debug.Log($"Intentando actualizar scoreText con valor: {finalScore}");
+            scoreText.text = $"Total Score: {finalScore}";
+            Debug.Log($"Texto establecido en scoreText: {scoreText.text}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error al actualizar el texto: {e.Message}");
         }
     }
 

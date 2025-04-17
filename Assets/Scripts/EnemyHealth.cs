@@ -12,7 +12,10 @@ public class EnemyHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
     }
-
+    void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
