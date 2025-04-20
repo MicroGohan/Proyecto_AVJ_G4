@@ -61,8 +61,10 @@ public class CharacterController : MonoBehaviour
     private int currentHealth; // Salud actual del personaje
     private bool isInvincible = false; // Indica si el personaje es invencible
 
-    public GameObject attackArea;
+    //public GameObject attackArea;
     private bool isAttacking = false;
+
+    public PlayerAttackArea attackArea;
 
     // Modifica el método TryAttack para activar/desactivar el área
     public void TryAttack()
@@ -81,6 +83,26 @@ public class CharacterController : MonoBehaviour
         isAttacking = false;
     }
 
+    public void EnableAttackArea()
+    {
+        if (attackArea != null)
+        {
+            attackArea.EnableArea();
+        }
+        else
+        {
+            Debug.LogWarning("AttackArea no está asignada en " + gameObject.name);
+        }
+    }
+
+    public void DisableAttackArea()
+    {
+        if (attackArea != null)
+        {
+            attackArea.DisableArea(); // Usa el método de PlayerAttackArea
+        }
+    }
+    /*
     // Métodos para activar/desactivar el área (llamados desde Animation Events)
     public void EnableAttackArea()
     {
@@ -90,7 +112,7 @@ public class CharacterController : MonoBehaviour
     public void DisableAttackArea()
     {
         attackArea.SetActive(false);
-    }
+    }*/
 
     void Awake() // Metodo para comenzar las animaciones
     {
@@ -99,6 +121,15 @@ public class CharacterController : MonoBehaviour
         cuerpoRigido.Sleep();
         currentHealth = maxHealth; // Inicializa la salud al máximo
         UpdateLivesText(); // Actualiza el texto de las vidas al inicio
+                           // Busca el PlayerAttackArea en los hijos si no está asignado
+        if (attackArea == null)
+        {
+            attackArea = GetComponentInChildren<PlayerAttackArea>();
+            if (attackArea == null)
+            {
+                Debug.LogWarning("No se encontró PlayerAttackArea en los hijos del personaje");
+            }
+        }
     }
 
     void Update() // Acciones

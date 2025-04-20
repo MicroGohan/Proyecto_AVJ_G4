@@ -1347,7 +1347,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.27042866, y: -0.38822556, z: -10}
+  m_LocalPosition: {x: -0.86906624, y: -0.38861084, z: -10}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3269,6 +3269,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1554050903}
   - component: {fileID: 1554050904}
+  - component: {fileID: 1554050905}
   m_Layer: 6
   m_Name: spada
   m_TagString: Player
@@ -3326,6 +3327,19 @@ PolygonCollider2D:
       - {x: 0.12995785, y: -0.010712922}
       - {x: 0.28213415, y: 0.025033215}
       - {x: 0.2840491, y: 0.08305961}
+--- !u!114 &1554050905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1554050902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 966bd1ad4cf916244afbd5a85cfec964, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 1
 --- !u!1 &1676480031
 GameObject:
   m_ObjectHideFlags: 0
@@ -3340,7 +3354,6 @@ GameObject:
   - component: {fileID: 1676480032}
   - component: {fileID: 1676480036}
   - component: {fileID: 1676480037}
-  - component: {fileID: 1676480038}
   m_Layer: 6
   m_Name: PlayerSamurai
   m_TagString: Player
@@ -3373,7 +3386,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   isAttacked: 0
-  attackArea: {fileID: 0}
+  attackArea: {fileID: 1554050905}
 --- !u!95 &1676480033
 Animator:
   serializedVersion: 5
@@ -3511,19 +3524,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.56, y: 0.69}
   m_EdgeRadius: 0
---- !u!114 &1676480038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1676480031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 966bd1ad4cf916244afbd5a85cfec964, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 1
 --- !u!1 &1682868933
 GameObject:
   m_ObjectHideFlags: 0
