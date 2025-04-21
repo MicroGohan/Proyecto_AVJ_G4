@@ -105,12 +105,12 @@ public class ScoreManager : MonoBehaviour
         Debug.Log($"Puntos sumados: {points} | Nivel: {currentLevelScore} | Total: {totalAccumulatedScore}");
         
         // Si estamos en el nivel 2 y alcanzamos 40 puntos
-        if (isLevel2 && currentLevelScore >= 40)
+        if (isLevel2 && currentLevelScore >= 80)
         {
             GoToDeathScene();
         }
         // Si estamos en el nivel 1 y alcanzamos 50 puntos
-        else if (!isLevel2 && currentLevelScore >= 50)
+        else if (!isLevel2 && currentLevelScore >= 240)
         {
             OpenPortal();
         }
