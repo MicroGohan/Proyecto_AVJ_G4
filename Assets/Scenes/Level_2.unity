@@ -1304,7 +1304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d358d753646d2164a8a52eb31b9019fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 1996657275}
   smoothSpeed: 0.125
   offset: {x: 8, y: 0, z: 0}
 --- !u!114 &413332884
@@ -3265,9 +3265,9 @@ MonoBehaviour:
   maxY: -0.5
   bounceStrength: 3
   maxHealth: 5
-  Lives: {fileID: 0}
+  Lives: {fileID: 1352224898}
   invincibilityTime: 1
-  chequeoSuelo: {fileID: 0}
+  chequeoSuelo: {fileID: 343163195}
   capaSuelo:
     serializedVersion: 2
     m_Bits: 0

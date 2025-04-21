@@ -7,30 +7,59 @@ public class PlayerAttackArea : MonoBehaviour
 {
     public int damage = 1;
     private Collider2D attackCollider;
-
-    private void Awake()
+    private bool isActive = false;
+    /*private void Awake()
     {
         attackCollider = GetComponent<PolygonCollider2D>();
         if (attackCollider != null)
         {
             attackCollider.enabled = false; // Desactiva el collider al inicio
         }
+    }*/
+    private void Awake()
+    {
+        attackCollider = GetComponent<PolygonCollider2D>();
+        if (attackCollider != null)
+        {
+            attackCollider.enabled = false;
+        }
+        else
+        {
+            Debug.LogError("No se encontró PolygonCollider2D en " + gameObject.name);
+        }
     }
     public void EnableArea()
     {
-        if (attackCollider != null)
+        if (attackCollider != null && !isActive)
         {
-            attackCollider.enabled = true; // Activa el collider
+            isActive = true;
+            attackCollider.enabled = true;
+            Debug.Log($"Área de ataque activada en {Time.time}");
+
+            // Forzar la desactivación después de un tiempo por seguridad
+            StartCoroutine(ForceDisableAfterDelay(0.5f));
         }
     }
+
     public void DisableArea()
     {
-        if (attackCollider != null)
+        if (attackCollider != null && isActive)
         {
-            attackCollider.enabled = false; // Desactiva el collider
+            isActive = false;
+            attackCollider.enabled = false;
+            Debug.Log($"Área de ataque desactivada en {Time.time}");
         }
     }
-    private void OnTriggerEnter2D(Collider2D other)
+    private IEnumerator ForceDisableAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (isActive)
+        {
+            Debug.LogWarning("Forzando desactivación del área de ataque por timeout");
+            DisableArea();
+        }
+    }
+    /*private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Enemy"))
         {
@@ -41,6 +70,25 @@ public class PlayerAttackArea : MonoBehaviour
                 Debug.Log($"Daño aplicado: {damage} a {other.name}");
             }
         }
+    }*/
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!isActive) return; // Extra verificación
+
+        if (other.CompareTag("Enemy"))
+        {
+            EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
+            if (enemyHealth != null)
+            {
+                enemyHealth.TakeDamage(damage);
+                Debug.Log($"Daño aplicado: {damage} a {other.name}");
+            }
+        }
     }
-    
+    private void OnDisable()
+    {
+        // Asegurarse de que el área se desactive si se desactiva el GameObject
+        DisableArea();
+    }
+
 }
