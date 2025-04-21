@@ -310,6 +310,9 @@ public class EnemySkeleton : EnemyBehaviour
         {
             rb.simulated = false;
         }
+        // Cancelar cualquier ataque pendiente
+        isAttacking = false;
+        isPlayingAnimation = false;
 
         // Destruir después de la animación
         Destroy(gameObject, 2f);

@@ -23,5 +23,10 @@ public class MusicManager : MonoBehaviour
         SFXSource.PlayOneShot(clip);
     }
 
+    public void StopAllSounds()
+    {
+        musicSource.Stop();
+        SFXSource.Stop();
+    }
 
 }

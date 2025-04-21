@@ -66,6 +66,7 @@ public class CharacterController : MonoBehaviour
 
     public PlayerAttackArea attackArea;
 
+    private MusicManager musicManager;
     // Modifica el método TryAttack para activar/desactivar el área
     public void TryAttack()
     {
@@ -113,7 +114,14 @@ public class CharacterController : MonoBehaviour
     {
         attackArea.SetActive(false);
     }*/
-
+    void Start()
+    {
+        musicManager = FindObjectOfType<MusicManager>();
+        if (musicManager == null)
+        {
+            Debug.LogWarning("No se encontró MusicManager en la escena.");
+        }
+    }
     void Awake() // Metodo para comenzar las animaciones
     {
         animator = GetComponent<Animator>();
@@ -222,35 +230,65 @@ public class CharacterController : MonoBehaviour
             transform.localScale = scale;
         }
     }
-
-    public void beingAttacked(Vector2 direccion, int DMG) // Metodo para dañar al jugador
+    public void beingAttacked(Vector2 direccion, int DMG)
     {
-        if (!isAttacked && !isInvincible) // Solo recibe daño si no está en período de invencibilidad
+        if (!isAttacked && !isInvincible)
         {
-            isAttacked = true;
-            animator.SetBool("isAttacked", isAttacked);
-
             // Reduce la salud
             currentHealth -= DMG;
-            UpdateLivesText(); // Actualiza el texto de las vidas
-
-            // Empuja al personaje en la dirección del ataque
-            Vector2 bounce = new Vector2(transform.position.x - direccion.x, 1).normalized;
-            cuerpoRigido.AddForce(bounce * bounceStrength, ForceMode2D.Impulse);
-
-            // Activa el período de invencibilidad
-            StartCoroutine(ActivateInvincibility());
-
-            // Detiene el empuje después de un breve período
-            StartCoroutine(StopBounce());
+            UpdateLivesText();
 
             // Verifica si el personaje murió
             if (currentHealth <= 0)
             {
-                Die();
+                Die(); // Va directamente a la muerte sin activar la animación de daño
+            }
+            else
+            {
+                // Solo activa la animación de daño si no está muriendo
+                isAttacked = true;
+                animator.SetBool("isAttacked", isAttacked);
+
+                // Empuja al personaje en la dirección del ataque
+                Vector2 bounce = new Vector2(transform.position.x - direccion.x, 1).normalized;
+                cuerpoRigido.AddForce(bounce * bounceStrength, ForceMode2D.Impulse);
+
+                // Activa el período de invencibilidad
+                StartCoroutine(ActivateInvincibility());
+
+                // Detiene el empuje después de un breve período
+                StartCoroutine(StopBounce());
             }
         }
     }
+    /* public void beingAttacked(Vector2 direccion, int DMG) // Metodo para dañar al jugador
+     {
+         if (!isAttacked && !isInvincible) // Solo recibe daño si no está en período de invencibilidad
+         {
+             isAttacked = true;
+             animator.SetBool("isAttacked", isAttacked);
+
+             // Reduce la salud
+             currentHealth -= DMG;
+             UpdateLivesText(); // Actualiza el texto de las vidas
+
+             // Empuja al personaje en la dirección del ataque
+             Vector2 bounce = new Vector2(transform.position.x - direccion.x, 1).normalized;
+             cuerpoRigido.AddForce(bounce * bounceStrength, ForceMode2D.Impulse);
+
+             // Activa el período de invencibilidad
+             StartCoroutine(ActivateInvincibility());
+
+             // Detiene el empuje después de un breve período
+             StartCoroutine(StopBounce());
+
+             // Verifica si el personaje murió
+             if (currentHealth <= 0)
+             {
+                 Die();
+             }
+         }
+     }*/
 
     IEnumerator StopBounce()
     {
@@ -270,25 +308,36 @@ public class CharacterController : MonoBehaviour
     private void Die()
     {
         Debug.Log("¡Jugador derrotado!");
-        animator.SetTrigger("Dead"); // Reproduce la animación de muerte
+        animator.SetTrigger("Dead");// Reproduce la animación de muerte
         if (ScoreManager.Instance != null) 
         {
             ScoreManager.Instance.SaveTotalScore();
         }
+        if (musicManager != null)
+        {
+            musicManager.StopAllSounds();
+            musicManager.PlaySFX(musicManager.Death);
+        }
         // Desactiva el movimiento y el control del personaje
         enabled = false;
-
         // Desactiva el collider (opcional)
         GetComponent<Collider2D>().enabled = false;
 
         // Desactiva el Rigidbody2D (opcional)
         GetComponent<Rigidbody2D>().simulated = false;
 
+        StartCoroutine(LoadDeadScene());
         // Carga la escena de muerte
-        UnityEngine.SceneManagement.SceneManager.LoadScene("DeadScene");
+        //UnityEngine.SceneManagement.SceneManager.LoadScene("DeadScene");
 
         // Reinicia la escena después de un breve retraso
         //StartCoroutine(RestartLevel());
+    }
+
+    private IEnumerator LoadDeadScene()
+    {
+        yield return new WaitForSeconds(2f); // Espera 2 segundos antes de cargar la escena de muerte
+        UnityEngine.SceneManagement.SceneManager.LoadScene("DeadScene");
     }
 
     IEnumerator RestartLevel()

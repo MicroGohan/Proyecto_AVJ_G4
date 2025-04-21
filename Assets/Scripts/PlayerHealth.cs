@@ -8,11 +8,12 @@ public class PlayerHealth : MonoBehaviour
     public int maxLives = 3; // Vidas máximas del jugador
     public int currentLives; // Vidas actuales del jugador
     public TMP_Text livesText; // Referencia al texto TMP de las vidas
-
+    private MusicManager musicManager;
     void Start()
     {
         currentLives = maxLives; // Inicializa las vidas al máximo
         UpdateLivesText(); // Actualiza el texto de las vidas
+        musicManager = FindObjectOfType<MusicManager>();
     }
     
     // Método para recibir daño
@@ -20,7 +21,10 @@ public class PlayerHealth : MonoBehaviour
     {
         currentLives -= damage; // Reduce las vidas
         Debug.Log("¡Jugador recibió daño! Vidas restantes: " + currentLives);
-
+        /*if (musicManager != null)
+        {
+            musicManager.PlaySFX(musicManager.Hurt);
+        }*/
         // Actualiza el texto de las vidas
         UpdateLivesText();
 
@@ -40,7 +44,11 @@ public class PlayerHealth : MonoBehaviour
     // Método para manejar la muerte del jugador
     void Die()
     {
-        Debug.Log("¡Jugador derrotado!");
+        Debug.Log("¡Jugador derrotado2!");
+        if (musicManager != null)
+        {
+            musicManager.PlaySFX(musicManager.Death);
+        }
         // Aquí puedes agregar lógica para reiniciar el nivel o mostrar un Game Over
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }

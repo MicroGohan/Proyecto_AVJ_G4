@@ -8,14 +8,13 @@ public class PlayerAttackArea : MonoBehaviour
     public int damage = 1;
     private Collider2D attackCollider;
     private bool isActive = false;
-    /*private void Awake()
+    private MusicManager musicManager;
+
+    void Start()
     {
-        attackCollider = GetComponent<PolygonCollider2D>();
-        if (attackCollider != null)
-        {
-            attackCollider.enabled = false; // Desactiva el collider al inicio
-        }
-    }*/
+        musicManager = FindObjectOfType<MusicManager>();
+    }
+
     private void Awake()
     {
         attackCollider = GetComponent<PolygonCollider2D>();
@@ -59,18 +58,7 @@ public class PlayerAttackArea : MonoBehaviour
             DisableArea();
         }
     }
-    /*private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Enemy"))
-        {
-            EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(damage);
-                Debug.Log($"Daño aplicado: {damage} a {other.name}");
-            }
-        }
-    }*/
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!isActive) return; // Extra verificación
@@ -83,6 +71,10 @@ public class PlayerAttackArea : MonoBehaviour
                 enemyHealth.TakeDamage(damage);
                 Debug.Log($"Daño aplicado: {damage} a {other.name}");
             }
+        }
+        if (musicManager != null)
+        {
+            musicManager.PlaySFX(musicManager.Attack);
         }
     }
     private void OnDisable()

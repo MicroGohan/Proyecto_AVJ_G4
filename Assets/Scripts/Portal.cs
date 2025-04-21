@@ -5,10 +5,16 @@ using UnityEngine.SceneManagement;
 
 public class Portal : MonoBehaviour
 {
+    private MusicManager musicManager;
     private void Start()
     {
         // Asegurarse de que el portal empiece desactivado
         gameObject.SetActive(false);
+        musicManager = FindObjectOfType<MusicManager>();
+        if (musicManager == null)
+        {
+            Debug.LogWarning("No se encontró MusicManager en la escena.");
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -19,6 +25,13 @@ public class Portal : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("Jugador entró al portal. Cargando siguiente nivel...");
+
+            // Detiene todos los sonidos y reproduce el sonido de teleport
+            if (musicManager != null)
+            {
+                musicManager.StopAllSounds();
+                musicManager.PlaySFX(musicManager.Teleport);
+            }
             if (ScoreManager.Instance != null)
             {
                 ScoreManager.Instance.OnLevelComplete(); // Guardar puntaje antes de cambiar nivel
