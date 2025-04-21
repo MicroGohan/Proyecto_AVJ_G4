@@ -10,6 +10,9 @@ public class EnemyHealth : MonoBehaviour
     private bool isStunned = false;  // Añadir esta variable
     private bool isAttacking = false; // Añadir esta variable
     private Rigidbody2D rb;          // Añadir esta variable
+    [SerializeField] private float hurtAnimationDuration = 0.20f; // Duración de la animación de daño
+    [SerializeField] private float stunDuration = 1.0f; // Tiempo de aturdimiento
+    private bool isHurt = false;
 
     private EnemySkeleton enemySkeleton;
 
@@ -46,21 +49,39 @@ public class EnemyHealth : MonoBehaviour
         }
 
         // Interrumpe cualquier ataque o acción actual
-        StopAllCoroutines();
+
+        // Marca que está siendo herido
+        isHurt = true;
         isStunned = true;
         isAttacking = false;
 
-        // Resetea todos los estados y triggers
-        animator.ResetTrigger("Attack1");
-        animator.ResetTrigger("Attack2");
-        animator.ResetTrigger("Attack3");
+        // Interrumpe cualquier ataque o acción actual
+        StopAllCoroutines();
+
+        // Resetea el estado de movimiento
         animator.SetBool("isRunning", false);
 
         // Reproduce la animación de daño
         animator.SetTrigger("Hurt");
-        StartCoroutine(RecoverFromStun(0.5f));
+
+        // Inicia las corrutinas de recuperación
+        StartCoroutine(HurtRecovery());
+        StartCoroutine(RecoverFromStun(stunDuration));
     }
 
+    private IEnumerator HurtRecovery()
+    {
+        // Espera a que termine la animación de daño
+        yield return new WaitForSeconds(hurtAnimationDuration);
+
+        // Resetea los triggers solo después de que la animación de daño termine
+        animator.ResetTrigger("Attack1");
+        animator.ResetTrigger("Attack2");
+        animator.ResetTrigger("Attack3");
+        animator.ResetTrigger("Hurt");
+
+        isHurt = false;
+    }
     private IEnumerator RecoverFromStun(float stunDuration)
     {
         yield return new WaitForSeconds(stunDuration);
@@ -75,12 +96,9 @@ public class EnemyHealth : MonoBehaviour
         StopAllCoroutines();
         isStunned = true;
         isAttacking = false;
+        isHurt = true;
 
-        // Resetear todos los triggers y estados
-        animator.ResetTrigger("Attack1");
-        animator.ResetTrigger("Attack2");
-        animator.ResetTrigger("Attack3");
-        animator.ResetTrigger("Hurt");
+        // Resetear estados de movimiento
         animator.SetBool("isRunning", false);
 
         // Activar animación de muerte
@@ -93,8 +111,11 @@ public class EnemyHealth : MonoBehaviour
             Debug.Log("Puntos asignados");
         }
 
-        // Desactivar comportamientos
         enabled = false;
+        if (enemySkeleton != null)
+        {
+            enemySkeleton.enabled = false;
+        }
 
         // Desactivar colisiones
         Collider2D collider = GetComponent<Collider2D>();
@@ -107,11 +128,21 @@ public class EnemyHealth : MonoBehaviour
         {
             rb.simulated = false;
         }
-
+        StartCoroutine(DestroyAfterAnimation());
         // Destruir después de la animación
         Destroy(gameObject, 1f);
     }
+    private IEnumerator DestroyAfterAnimation()
+    {
+        // Esperar a que la animación de muerte termine
+        yield return new WaitForSeconds(1f);
 
+        // Desactivar el GameObject completo antes de destruirlo
+        gameObject.SetActive(false);
+
+        // Destruir el objeto
+        Destroy(gameObject);
+    }
     /*private void Die()
     {
         if (ScoreManager.Instance == null)

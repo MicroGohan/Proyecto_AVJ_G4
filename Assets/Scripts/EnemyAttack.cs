@@ -9,7 +9,7 @@ public class EnemyAttack : MonoBehaviour
     public float attackCooldown = 2f; // Tiempo entre ataques
     public Transform attackPoint; // Punto desde donde se detecta el ataque
     public LayerMask playerLayer; // Capa del jugador
-
+    private EnemyHealth enemyHealth;
     private Animator animator;
     private float nextAttackTime = 0f;
 
@@ -20,6 +20,8 @@ public class EnemyAttack : MonoBehaviour
 
     void Update()
     {
+        if (!enemyHealth.enabled) // Si EnemyHealth está deshabilitado, significa que está muerto
+            return;
         // Verifica si es momento de atacar
         if (Time.time >= nextAttackTime)
         {

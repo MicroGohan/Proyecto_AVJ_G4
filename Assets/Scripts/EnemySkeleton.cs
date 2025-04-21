@@ -24,6 +24,12 @@ public class EnemySkeleton : EnemyBehaviour
     public Transform attackPoint; // Crear un GameObject hijo y asignarlo
     public float attackRadius = 1f; // Radio del área de daño
     // Start is called before the first frame update
+    private float attack1Duration = 1.0f;
+    private float attack2Duration = 1.0f;
+    private float attack3Duration = 1.0f;
+    private float currentAttackDuration; // Añadir esta variable
+    private bool isPlayingAnimation = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -106,8 +112,8 @@ public class EnemySkeleton : EnemyBehaviour
 
     private void TryToAttack()
     {
-        // No atacar si está muerto o aturdido
-        if (currentHealth <= 0 || isStunned) return;
+        // No atacar si está muerto, aturdido o en medio de una animación
+        if (currentHealth <= 0 || isStunned || isPlayingAnimation) return;
 
         if (Time.time >= nextAttackTime && !isAttacking)
         {
@@ -121,6 +127,7 @@ public class EnemySkeleton : EnemyBehaviour
         if (currentHealth <= 0 || isStunned) return;
 
         isAttacking = true;
+        isPlayingAnimation = true;
 
         // Asegura que el enemigo mire al jugador
         if (target != null)
@@ -133,20 +140,32 @@ public class EnemySkeleton : EnemyBehaviour
         {
             case 1:
                 animator.SetTrigger("Attack1");
+                currentAttackDuration = attack1Duration;
                 break;
             case 2:
                 animator.SetTrigger("Attack2");
+                currentAttackDuration = attack2Duration;
                 break;
             case 3:
                 animator.SetTrigger("Attack3");
+                currentAttackDuration = attack3Duration;
                 break;
         }
 
-        StartCoroutine(ResetAttackState(0.5f)); // Asegura que isAttacking se resetee
-        StartCoroutine(ApplyDamageWithDelay(0.5f));
+        /*StartCoroutine(ResetAttackState(0.5f)); // Asegura que isAttacking se resetee
+        StartCoroutine(ApplyDamageWithDelay(0.7f));
+    }*/
+        StartCoroutine(ApplyDamageWithDelay(currentAttackDuration * 0.75f));
+        StartCoroutine(FinishAttackAnimation(currentAttackDuration));
+    }
+    private IEnumerator FinishAttackAnimation(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        isPlayingAnimation = false;
+        isAttacking = false;
     }
     // Llamar en el frame donde la animación muestra el golpe
-    
+
     // Agregar este método para asegurar que el estado de ataque se resetee
     private IEnumerator ResetAttackState(float delay)
     {
@@ -232,6 +251,7 @@ public class EnemySkeleton : EnemyBehaviour
         StopAllCoroutines();
         isStunned = true;
         isAttacking = false;
+        isPlayingAnimation = false;
 
         // Resetea todos los estados y triggers
         animator.ResetTrigger("Attack1");
